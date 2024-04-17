@@ -28,8 +28,7 @@
     If you haven't been tracking your configurations in a Git repository before, you can start using this technique
     easily with these lines:
   </p>
-  <pre><code>
-      git init --bare $HOME/.cfg
+  <pre><code>git init --bare $HOME/.cfg
       alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
       config config --local status.showUntrackedFiles no
       echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.bashrc</code></pre>
@@ -37,8 +36,7 @@
   <p>After you've executed the setup any file within the $HOME folder can be versioned with normal commands, replacing
     git with your newly created config alias, like:
   </p>
-  <pre><code>
-      config status
+  <pre><code>config status
       config add .vimrc
       config commit -m "Add vimrc"
       config add .bashrc
@@ -51,41 +49,62 @@
   <ul>
     <li class="lilist">
       Prior to the installation make sure you have committed the alias to your .bashrc or .zsh:
-      <pre><code>
-          alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-        </code></pre>
+      <pre><code>alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'</code></pre>
     </li>
 
     <li class="lilist">
       And that your source repository ignores the folder where you'll clone it, so that you don't create weird recursion
       problems:
-      <pre><code>
-          echo ".cfg" >> .gitignore
-        </code></pre>
+      <pre><code>echo ".cfg" >> .gitignore</code></pre>
     </li>
     <li class="lilist">
-      Prior to the installation make sure you have committed the alias to your .bashrc or .zsh:
-      <pre><code>
-          alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+      Now clone your dotfiles into a bare repository in a "dot" folder of your $HOME:
+      <pre><code>git clone --bare <git-repo-url> $HOME/.cfg</code></pre>
+    </li>
+
+    <li class="lilist">
+      Define the alias in the current shell scope:
+      <pre><code>alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'</code></pre>
+    </li>
+
+    <li class="lilist">
+      Checkout the actual content from the bare repository to your $HOME:
+      <pre><code>config checkout</code></pre>
+    </li>
+    <li class="lilist">The step above might fail with a message like:
+      <pre><code>error: The following untracked working tree files would be overwritten by checkout:
+          .bashrc
+          .gitignore
+          Please move or remove them before you can switch branches.
+          Aborting
+        </code></pre>
+      This is because your $HOME folder might already have some stock configuration files which would be overwritten by
+      Git. The solution is simple: back up the files if you care about them, remove them if you don't care. I provide
+      you with a possible rough shortcut to move all the offending files automatically to a backup folder:
+      <pre><code>mkdir -p .config-backup && \
+          config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | \
+          xargs -I{} mv {} .config-backup/{}
         </code></pre>
     </li>
+
     <li class="lilist">
-      Prior to the installation make sure you have committed the alias to your .bashrc or .zsh:
-      <pre><code>
-          alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-        </code></pre>
+
+
+      Re-run the check out if you had problems:
+
+      <pre><code>config checkout</code></pre>
+    </li>
+    <li class="lilist">Set the flag showUntrackedFiles to no on this specific (local) repository:
+      <pre><code>config config --local status.showUntrackedFiles no</code></pre>
     </li>
     <li class="lilist">
-      Prior to the installation make sure you have committed the alias to your .bashrc or .zsh:
-      <pre><code>
-          alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-        </code></pre>
-    </li>
-    <li class="lilist">
-      Prior to the installation make sure you have committed the alias to your .bashrc or .zsh:
-      <pre><code>
-          alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-        </code></pre>
+      You're done, from now on you can now type config commands to add and update your dotfiles:
+      <pre><code>config status
+          config add .vimrc
+          config commit -m "Add vimrc"
+          config add .bashrc
+          config commit -m "Add bashrc"
+          config push</code></pre>
     </li>
   </ul>
 
