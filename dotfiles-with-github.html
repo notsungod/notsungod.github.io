@@ -2,7 +2,7 @@
 <html lang=en>
 
 <head>
-  <meta charset="utf-8">
+<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="light dark">
@@ -25,87 +25,99 @@
     personal use.
   </p>
   <p>
-    If you haven't been tracking your configurations in a Git repository before, you can start using this technique
-    easily with these lines:
+    If you haven't been tracking your configurations in a Git repository before, you can start using this technique easily with these lines:
   </p>
   <pre><code>git init --bare $HOME/.cfg
-      alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-      config config --local status.showUntrackedFiles no
-      echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.bashrc</code></pre>
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+config config --local status.showUntrackedFiles no
+echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.bashrc</code></pre>
   <br>
   <p>After you've executed the setup any file within the $HOME folder can be versioned with normal commands, replacing
     git with your newly created config alias, like:
   </p>
   <pre><code>config status
-      config add .vimrc
-      config commit -m "Add vimrc"
-      config add .bashrc
-      config commit -m "Add bashrc"
-      config push</code></pre>
+config add .vimrc
+config commit -m "Add vimrc"
+config add .bashrc
+config commit -m "Add bashrc"
+config push</code></pre>
   <br>
   <h2 id="browser"><a href="#browser">Installing Dotfiles from GitHub</a></h2>
-  <p>If you already store your configuration/dotfiles in a Git repository, on a new system you can migrate to this setup
-    with the following steps:</p>
+  <p>If you already store your configuration/dotfiles in a Git repository, on a new system you can migrate to this setup   with the following steps:</p>
   <ul>
     <li class="lilist">
       Prior to the installation make sure you have committed the alias to your .bashrc or .zsh:
-      <pre><code>alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'</code></pre>
     </li>
+      <br>
+    <pre><code>alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'</code></pre>
 
     <li class="lilist">
       And that your source repository ignores the folder where you'll clone it, so that you don't create weird recursion
       problems:
-      <pre><code>echo ".cfg" >> .gitignore</code></pre>
     </li>
+      <br>
+    <pre><code>echo ".cfg" >> .gitignore</code></pre>
     <li class="lilist">
       Now clone your dotfiles into a bare repository in a "dot" folder of your $HOME:
-      <pre><code>git clone --bare <git-repo-url> $HOME/.cfg</code></pre>
     </li>
+      <br>
+    <pre><code>git clone --bare <git-repo-url> $HOME/.cfg</code></pre>
+
 
     <li class="lilist">
       Define the alias in the current shell scope:
-      <pre><code>alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'</code></pre>
     </li>
+      <br>
+    <pre><code>alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'</code></pre>
+
 
     <li class="lilist">
       Checkout the actual content from the bare repository to your $HOME:
-      <pre><code>config checkout</code></pre>
     </li>
+      <br>
+    <pre><code>config checkout</code></pre>
     <li class="lilist">The step above might fail with a message like:
-      <pre><code>error: The following untracked working tree files would be overwritten by checkout:
-          .bashrc
-          .gitignore
-          Please move or remove them before you can switch branches.
-          Aborting
-        </code></pre>
+    </li>
+      <br>
+    <pre><code>error: The following untracked working tree files would be overwritten by checkout:
+.bashrc
+.gitignore
+Please move or remove them before you can switch branches.
+Aborting
+      </code></pre>
+    <li>
       This is because your $HOME folder might already have some stock configuration files which would be overwritten by
       Git. The solution is simple: back up the files if you care about them, remove them if you don't care. I provide
       you with a possible rough shortcut to move all the offending files automatically to a backup folder:
-      <pre><code>mkdir -p .config-backup && \
-          config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | \
-          xargs -I{} mv {} .config-backup/{}
-        </code></pre>
     </li>
+      <br>
+    <pre><code>mkdir -p .config-backup && \
+        config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | \
+        xargs -I{} mv {} .config-backup/{}
+      </code></pre>
 
     <li class="lilist">
 
 
       Re-run the check out if you had problems:
 
-      <pre><code>config checkout</code></pre>
     </li>
+      <br>
+    <pre><code>config checkout</code></pre>
     <li class="lilist">Set the flag showUntrackedFiles to no on this specific (local) repository:
-      <pre><code>config config --local status.showUntrackedFiles no</code></pre>
     </li>
+      <br>
+    <pre><code>config config --local status.showUntrackedFiles no</code></pre>
     <li class="lilist">
       You're done, from now on you can now type config commands to add and update your dotfiles:
-      <pre><code>config status
-          config add .vimrc
-          config commit -m "Add vimrc"
-          config add .bashrc
-          config commit -m "Add bashrc"
-          config push</code></pre>
     </li>
+      <br>
+    <pre><code>config status
+config add .vimrc
+config commit -m "Add vimrc"
+config add .bashrc
+config commit -m "Add bashrc"
+config push</code></pre>
   </ul>
 
   <a class="back" href="/index.html">Go back</a>
