@@ -40,7 +40,7 @@ window.onstorage = (e) => {
     }
 };
 
-localStorage.getItem(key) ?  applyTheme() : matchSystem();
+localStorage.getItem(key) ? applyTheme() : matchSystem();
 document.head.appendChild(style);
 
 
@@ -48,9 +48,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let codeTags = document.querySelectorAll('code');
     console.log("lol");
     codeTags.forEach(function(codeTag) {
-        let codeContent = codeTag.innerHTML;
-        codeContent = codeContent.replace(/'      '/g, '');
-        codeTag.innerHTML = codeContent;
+        let codeContent = codeTag.textContent;
+        codeContent = codeContent.replace(/ {6}/g, '');  // Replacing 6 spaces with nothing
+        codeTag.textContent = codeContent;
     });
 });
-
