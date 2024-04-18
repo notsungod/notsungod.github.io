@@ -46,10 +46,10 @@ document.head.appendChild(style);
 
 document.addEventListener("DOMContentLoaded", function() {
     let codeTags = document.querySelectorAll('code');
-    
+    console.log("lol");
     codeTags.forEach(function(codeTag) {
         let codeContent = codeTag.innerHTML;
-        codeContent = codeContent.replace(/\t/g, '');
+        codeContent = codeContent.replace(/'      '/g, '');
         codeTag.innerHTML = codeContent;
     });
 });
