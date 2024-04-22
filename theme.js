@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("lol");
     codeTags.forEach(function(codeTag) {
         let codeContent = codeTag.textContent;
-        codeContent = codeContent.replace(/ {6}/g, '');  // Replacing 6 spaces with nothing
+        codeContent = codeContent.replace(/ {2,}/g, '');  // Replacing 6 spaces with nothing
         codeTag.textContent = codeContent;
     });
 });
