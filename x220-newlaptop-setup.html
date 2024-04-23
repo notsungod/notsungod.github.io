@@ -27,73 +27,70 @@
     3. add coreboot
   </p>
 
-  <h2 id="operating-system"><a href="#operating-system">Operating System</a></h2>
-
-  <h3 id="desktop-os"><a href="#desktop-os">Desktop</a></h3>
+  <h2 id="operating-system"><a href="#operating-system">Cloning os onto X200</a></h2>
 
   <p>
-    The desktop security model is very broken. <a
-      href="https://blog.cryptographyengineering.com/2017/03/05/secure-computing-for-journalists/">It was not designed
-      with security
-      in mind</a> — security was only a poorly implemented afterthought. However, there are some operating systems that
-    are less bad
-    in this regard. If you can, stay away from desktop and <a href="#mobile-os">stick to mobile devices</a>. <br>
-    <br>
-    Use Windows 11 (preferably in <a href="https://www.microsoft.com/en-us/windows/s-mode">S mode</a> and on a
-    Secured-Core PC),
-    macOS, ChromeOS or <a href="https://www.qubes-os.org/">QubesOS</a>. Generally, these operating systems have made
-    substantial
-    progress on adopting modern exploit mitigations, verified boot, sandboxing, memory safe languages and so on. <br>
-    <br>
-    There are advantages and disadvantages between these options, and it is not possible to give an accurate
-    recommendation as to which of
-    these will suit any particular person. One must develop their own threat model and choose the suitable operating
-    system in accordance.
-    For example, Windows 10 has great exploit mitigations, such as its coarse-grained, forward-edge CFI implementation,
-    <a href="https://docs.microsoft.com/en-us/windows/win32/secbp/control-flow-guard">Control Flow Guard</a>, whereas
-    macOS has <a href="https://support.apple.com/en-us/HT208330">full verified boot</a> to eliminate malware
-    persistence. <br>
-    <br>
-    Some of these operating systems do have some privacy invasive telemetry, but it can usually be disabled in the
-    settings and
-    verified with a network analyser tool like Wireshark if you wish to be certain. <br>
-    <br>
-    The security of QubesOS depends entirely on how you use it. The security within the virtual machines matter a lot —
-    don't
-    neglect it. Make sure that you use secure guest operating systems and split everything between as many virtual
-    machines as
-    possible. Virtualisation can be a very strong security boundary, but it is not magic. I'd recommend reading <a
-      href="https://seclists.org/dailydave/2010/q3/29">Brad Spengler's criticisms of QubesOS</a> to understand some of
-    its limitations. <br>
-    <br>
-    <a href="linux.html">Do not use Linux</a> (QubesOS <a
-      href="https://www.qubes-os.org/faq/#is-qubes-just-another-linux-distribution">is not a Linux distribution</a>).
+    First plug-in auraofelbaf or any linux-usb to whipe the local-ssd from any existing os or bloat like Windows (I
+    could only boot the usb from one (yellow on the right) of the 3 usb ports!).
+    I used GParted that's preinstalled in auraofelbaf to whipe internal ssd, create gpt filesystem on it.
+    After that i plugged in my external-ssd with the os on it.
+    Then i created a 500MB fat32 partition (use esp FLAG !!!), followed by copying encrypted swap from external-ssd to
+    local-ssd, then i
+    created a ext4 fs on local-ssd and used these commands to encrypt it:
   </p>
 
-  <h3 id="mobile-os"><a href="#mobile-os">Mobile</a></h3>
+  <pre><code># cryptsetup luksFormat /dev/sda2
+      # cryptsetup open /dev/sda2 root
+      # mkfs.ext4 /dev/mapper/root
+      # mount /dev/mapper/root /mnt</code></pre>
 
   <p>
-    Mobile operating systems were designed with security as a foundational component. They were built with sandboxing,
-    verified boot,
-    modern exploit mitigations and more from the start. As such, they are far more locked down than other platforms and
-    significantly
-    more resistant to attacks. <br>
-    <br>
-    Use either the stock operating system or preferably, <a href="https://grapheneos.org/">GrapheneOS</a> on a Pixel ≥4.
-    Do not
-    root your device, do not keep your bootloader unlocked and stay away from alternative operating systems like
-    LineageOS, as
-    they substantially worsen the security model. Read the <a href="android.html">Android article</a> for more details.
-    <br>
-    <br>
-    Alternatively, use an up-to-date iPhone, which is comparable to GrapheneOS on a Pixel, and do not jailbreak your
-    device. <br>
-    <br>
-    <a href="linux-phones.html">Stay away from Linux phones</a>.
+    To clone the file-system onto the local-ssd i used rsync:
+  <pre><code>rsync -axHAWXS --numeric-ids --info=progress2 external-ssd/ local-ssd/</code></pre>
+  Here the <code>/</code> are important to ensure not the folder external-ssd but the content is cloned to local-ssd.
+  This may take a while to run.
+  <br>
+  Now run
+  <pre><code>arch-chroot</code></pre>
+  to chroot onto the local encrypted mounted filesystem.
+  After that mount the local fat32 to /efi and and the external fat32 to /mnt. Then just <code>cp -r</code> the contents
+  over.
+  <br>
+  Now unmount the external-ssd we dont need it anymore.
+  <br>
+  Before we reboot into our new OS we need to take a look at the file /etc/fstab , /etc/crypttab , and
+  /etc/kernel/cmdline .
+  <br>
+  In /etc/fstab change PARTUUID of /efi partition to the new local one.
+  Usefull commands:
+  <pre><code>ls -la /dev/disk/by-partuuid
+      lsblk
+      vi /etc/fstab</code></pre>
+  <br>
+  With /etc/crypttab its similar except now we change the UUID of the encrypted swap partition.
+  <br>
+  In /etc/kernel/cmdline we need to change the UUID of the encrypted root partition accordingly.
+  <br>
+  Now run <code>sbctl generate-bundles</code>.
+  And <code># efibootmgr --create --disk /dev/sdX --part partition_number --label "Arch Linux" --loader
+    '\EFI\Linux\arch-linux.efi' --unicode</code>
+
+  Nice! Now we just reboot and pray!
+
+  If not:
+  OK rip im getting ERROR failed to mount '' on real root Skipping fsck cant access tty job control turned off
+  What i personally did is not trying to fix this problem but to use systemd-boot which worked, but is obviously a lazy
+  approach.
+  so what i did is:
+  <pre><code>bootctl install</code></pre>
+  and after that edited a file like this to my .efi file.
+  <pre><code> esp/loader/entries/fwupd.conf
+      ------------------------
+      title Firmware updater
+      efi /EFI/tools/fwupdx64.efi
+    </code></pre>
+  rebooted and it worked!
   </p>
-
-  <h2 id="browser"><a href="#browser">Browser</a></h2>
-
   <p>
     For security, use Chromium. Avoid Firefox or browsers based on it, as they are currently <a
       href="firefox-chromium.html">very

@@ -45,7 +45,7 @@ document.head.appendChild(style);
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    let codeTags = document.querySelectorAll('code');
+    let codeTags = document.querySelectorAll('code:not(.dont-edit)');
     console.log("lol");
     codeTags.forEach(function(codeTag) {
         let codeContent = codeTag.textContent;
