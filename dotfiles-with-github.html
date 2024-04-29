@@ -15,7 +15,6 @@
 <body>
   <button class="theme-toggle">🌓</button>
   <h1>How to use Dotfiles with GitHub</h1>
-
   <p class="date"><em><time datetime="2022-04-02">Last edited: April 15th, 2024</time></em></p>
 
   <h2 id="operating-system"><a href="#operating-system">Setting up Dotfiles with Github</a></h2>
@@ -44,69 +43,14 @@
   <h2 id="browser"><a href="#browser">Installing Dotfiles from GitHub</a></h2>
   <p>If you already store your configuration/dotfiles in a Git repository, on a new system you can migrate to this setup
     with the following steps:</p>
-  <ul>
-    <li class="lilist">
-      Prior to the installation make sure you have committed the alias to your .bashrc or .zsh:
-    </li>
-
-    <pre><code>alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'</code></pre>
-    <li class="lilist">
-      And that your source repository ignores the folder where you'll clone it, so that you don't create weird recursion
-      problems:
-    </li>
-    <pre><code>echo ".cfg" >> .gitignore</code></pre>
-    <li class="lilist">
-      Now clone your dotfiles into a bare repository in a "dot" folder of your $HOME:
-    </li>
-    <pre><code>git clone --bare <git-repo-url> $HOME/.cfg</code></pre>
-
-
-    <li class="lilist">
-      Define the alias in the current shell scope:
-    </li>
-    <pre><code>alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'</code></pre>
-
-
-    <li class="lilist">
-      Checkout the actual content from the bare repository to your $HOME:
-    </li>
-    <pre><code>config checkout</code></pre>
-    <li class="lilist">The step above might fail with a message like:
-    </li>
-    <pre><code>error: The following untracked working tree files would be overwritten by checkout:
-        .bashrc
-        .gitignore
-        Please move or remove them before you can switch branches.
-        Aborting
-      </code></pre>
-    <li>
-      This is because your $HOME folder might already have some stock configuration files which would be overwritten by
-      Git. The solution is simple: back up the files if you care about them, remove them if you don't care. I provide
-      you with a possible rough shortcut to move all the offending files automatically to a backup folder:
-    </li>
-    <pre><code>mkdir -p .config-backup && \
-        config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | \
-        xargs -I{} mv {} .config-backup/{}
-      </code></pre>
-
-    <li class="lilist">
-      Re-run the check out if you had problems:
-    </li>
-    <pre><code>config checkout</code></pre>
-    <li class="lilist">Set the flag showUntrackedFiles to no on this specific (local) repository:
-    </li>
-    <pre><code>config config --local status.showUntrackedFiles no</code></pre>
-    <li class="lilist">
-      You're done, from now on you can now type config commands to add and update your dotfiles:
-    </li>
-    <pre><code>config status
-        config add .vimrc
-        config commit -m "Add vimrc"
-        config add .bashrc
-        config commit -m "Add bashrc"
-        config push</code></pre>
-  </ul>
-
+  <pre><code>echo ".cfg" >> .gitignore
+      git clone -q --bare https://github.com/notsungod/dotfiles $HOME/.cfg
+      rm .bashrc
+      /usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME checkout
+      /usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME config --local status.showuntrackedfiles no
+    </code></pre>
+  <p>Done! Now you are setup with your personal dotfiles (CAUTION: this works if you have a fresh install, if not you
+    need to remove the currently present configuration. Check out error messages.)</p>
   <a class="back" href="/index.html">Go back</a>
 
 </body>

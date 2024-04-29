@@ -18,213 +18,61 @@
 
   <p class="date"><em><time datetime="2022-04-02">Last edited: April 2nd, 2024</time></em></p>
 
-  <h2 id="desktop-hardware"><a href="#desktop-hardware">Forethoughts</a></h2>
-
-  <p>The plan is:
-    0. make sure the laptop is clean off weird malware.
-    1. load my hardened arch os onto laptop.
-    2. remove intel me
-    3. add coreboot
-  </p>
-
-  <h2 id="operating-system"><a href="#operating-system">Cloning os onto X200</a></h2>
-
+  <h2 id="operating-system"><a href="#operating-system">Instaling OS on device</a></h2>
+  <p>NOTE: This step is not neccesary but could be helpful when troubleshooting later occurring problems</p>
+  <br>
   <p>
     First plug-in auraofelbaf or any linux-usb to whipe the local-ssd from any existing os or bloat like Windows (I
     could only boot the usb from one (yellow on the right) of the 3 usb ports!).
-    I used GParted that's preinstalled in auraofelbaf to whipe internal ssd, create gpt filesystem on it.
-    After that i plugged in my external-ssd with the os on it.
-    Then i created a 500MB fat32 partition (use esp FLAG !!!), followed by copying encrypted swap from external-ssd to
-    local-ssd, then i
-    created a ext4 fs on local-ssd and used these commands to encrypt it:
+    After I used the auraofelbaf installer script to install my personal hardened Arch onto the X220.
+  </p>
+  <p> Nice! Now we just reboot and pray!
+
   </p>
 
-  <pre><code># cryptsetup luksFormat /dev/sda2
-      # cryptsetup open /dev/sda2 root
-      # mkfs.ext4 /dev/mapper/root
-      # mount /dev/mapper/root /mnt</code></pre>
+  <h2 id="operating-system"><a href="#operating-system">Coreboot + IntelME shrinking</a></h2>
 
+  <h3>Preparations</h3>
   <p>
-    To clone the file-system onto the local-ssd i used rsync:
-  <pre><code>rsync -axHAWXS --numeric-ids --info=progress2 external-ssd/ local-ssd/</code></pre>
-  Here the <code>/</code> are important to ensure not the folder external-ssd but the content is cloned to local-ssd.
-  This may take a while to run.
-  <br>
-  Now run
-  <pre><code>arch-chroot</code></pre>
-  to chroot onto the local encrypted mounted filesystem.
-  After that mount the local fat32 to /efi and and the external fat32 to /mnt. Then just <code>cp -r</code> the contents
-  over.
-  <br>
-  Now unmount the external-ssd we dont need it anymore.
-  <br>
-  Before we reboot into our new OS we need to take a look at the file /etc/fstab , /etc/crypttab , and
-  /etc/kernel/cmdline .
-  <br>
-  In /etc/fstab change PARTUUID of /efi partition to the new local one.
-  Usefull commands:
-  <pre><code>ls -la /dev/disk/by-partuuid
-      lsblk
-      vi /etc/fstab</code></pre>
-  <br>
-  With /etc/crypttab its similar except now we change the UUID of the encrypted swap partition.
-  <br>
-  In /etc/kernel/cmdline we need to change the UUID of the encrypted root partition accordingly.
-  <br>
-  Now run <code>sbctl generate-bundles</code>.
-  And <code># efibootmgr --create --disk /dev/sdX --part partition_number --label "Arch Linux" --loader
-    '\EFI\Linux\arch-linux.efi' --unicode</code>
-
-  Nice! Now we just reboot and pray!
-
-  If not:
-  OK rip im getting ERROR failed to mount '' on real root Skipping fsck cant access tty job control turned off
-  What i personally did is not trying to fix this problem but to use systemd-boot which worked, but is obviously a lazy
-  approach.
-  so what i did is:
-  <pre><code>bootctl install</code></pre>
-  and after that edited a file like this to my .efi file.
-  <pre><code> esp/loader/entries/fwupd.conf
-      ------------------------
-      title Firmware updater
-      efi /EFI/tools/fwupdx64.efi
-    </code></pre>
-  rebooted and it worked!
+    You will need:
   </p>
-  <p>
-    For security, use Chromium. Avoid Firefox or browsers based on it, as they are currently <a
-      href="firefox-chromium.html">very
-      lacking in security</a>. Microsoft Edge is a better choice for Windows users, as it can utilise <a
-      href="https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-application-guard/md-app-guard-overview">
-      Microsoft Defender Application Guard</a> (MDAG) and has an
-    <a href="https://microsoftedge.github.io/edgevr/posts/Introducing-Enhanced-Security-for-Microsoft-Edge/">enhanced
-      security mode</a>
-    in which JIT is disabled and mitigations such as ACG, CIG, CFG and CET are all enabled in the renderer process. <br>
-    <br>
-    For privacy, use the Tor Browser, and consider using the security slider. Do not assume that "hardening" Firefox or
-    other browsers will make it private; <a href="browser-tracking.html">it won't</a>.
-    Be aware that this has massively reduced security from other options, as mentioned above. <br>
-    <br>
-    For a mixture of security and privacy, use <a href="https://github.com/GrapheneOS/Vanadium">Vanadium</a>,
-    <a href="https://www.bromite.org/">Bromite</a> or <a href="https://brave.com/">Brave</a>, although none of these are
-    as good as the Tor Browser when it comes to privacy.
-  </p>
-
-  <h2 id="messenger"><a href="#messenger">Messenger</a></h2>
-
-  <p>
-    <a href="messengers.html">Use Signal</a>, preferably with a burner or VoIP number.
-  </p>
-
-  <h2 id="email"><a href="#email">Email</a></h2>
-
-  <p>
-    If you can, <a href="https://latacora.singles/2020/02/19/stop-using-encrypted.html">stay away from email</a>, as it
-    is a fundamentally
-    insecure protocol, but if you must use it, use a reputable email provider with a strong focus on security, such as
-    <a href="https://protonmail.com/">ProtonMail</a> or <a href="https://tutanota.com/">Tutanota</a>. <br>
-    <br>
-    Consider staying away from web apps, as <a
-      href="https://protonmail.com/blog/cryptographic-architecture-response/">they can
-      provide weaker security</a>. When a user visits a website in a browser, that website can target that specific user
-    with
-    malicious JavaScript, whereas with a native app, the code is static. Additionally, apps can offer better protection
-    against MITM
-    attacks by pinning TLS certificates and removing the dependency on certificate authorities. This is commonly used in
-    apps like <a
-      href="https://protonmail.com/blog/tls-ssl-certificate/#Extra-security-precautions-taken-by-ProtonMail">ProtonMail</a>,
-    <a href="https://www.signal.org/blog/certifiably-fine/">Signal</a> and so on. However, websites in a browser are
-    much less privileged,
-    as they do not have direct access to system resources. Thus, using a web app could be more secure under certain
-    threat models.
-  </p>
-
-  <h2 id="passwords-2fa"><a href="#passwords-2fa">Passwords/2FA</a></h2>
-
-  <p>
-    Store passwords in a good password manager — <a href="https://keepass.info/">KeePass</a> or <a
-      href="https://bitwarden.com/">
-      Bitwarden</a> is recommended. Generate 20+ character passwords containing a completely random assortment of upper
-    and
-    lowercase letters, numbers and symbols. Use a different password on each website, and enable two-factor
-    authentication
-    (2FA) for every website. Do not use SMS for 2FA, as it is vulnerable to simjacking and man-in-the-middle attacks.
-    Use an authenticator app like <a href="https://getaegis.app/">Aegis</a>.
-  </p>
-
-  <h2 id="social-media"><a href="#social-media">Social Media</a></h2>
-
-  <p>
-    Don't.
-  </p>
-
-  <h2 id="general"><a href="#general">General</a></h2>
-
   <ul>
     <li class="lilist">
-      Do not put any sensitive information online if you can help it. If you must, use strong encryption.
+      ThinkPad X220
     </li>
 
     <li class="lilist">
-      Always use full-disk encryption. Use
-      <a href="https://docs.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-overview">
-        Bitlocker</a> on Windows, <a
-        href="https://support.apple.com/guide/deployment/intro-to-filevault-dep82064ec40/web">
-        FileVault</a> on macOS and <a href="https://wiki.archlinux.org/title/Dm-crypt">dm-crypt</a> on Linux.
+      A SPI programmer
+      <a
+        href="https://www.amazon.com/DAOKI-Programmer-CH341A-Burner-EEPROM/dp/B07RV35D4B/ref=sr_1_7?crid=812HCM447F0&dib=eyJ2IjoiMSJ9.t7HKMMWQy1ocMk64AAIoPH_n0YCp9ENJ8uzOeNalgdCxZBTuMk4gpieP5OS4RjMcVG-7tyeWkqrhGRjWj68OGCjPb6mnXACLIF50iEEAPDAsxbNA5rdwAEnzEacrKT9NmgfJaHWEemXz4h4XOcVNyETv6WMKv_D5ITyrGBwnVrPnQg9rBt-YrFSfdVXPeC_zxV1tqpcZpPEjT6WzdHo8F67zMfBGorogElzTlW57IJI.b03ORVgXgmxlCrP8fZ5MTZpAWAqx6GiqWM8TnKVUu04&dib_tag=se&keywords=spi+flash&qid=1714392806&sprefix=spi+flash%2Caps%2C207&sr=8-7">
+        for example</a>
     </li>
 
     <li class="lilist">
-      Do not plug your devices into unknown ports.
+      Another computer with Linux installed and Internet connection.
     </li>
 
     <li class="lilist">
-      Always update.
+      Patience ig.
     </li>
 
-    <li class="lilist">
-      Do not install a bunch of sketchy "security" software. Keep it minimal.
-    </li>
-
-    <li class="lilist">
-      Never leave your devices unattended.
-    </li>
-
-    <li class="lilist">
-      Always use HTTPS. Manually type in the <code>https://</code> part of the URL when visting a website to prevent <a
-        href="https://security.stackexchange.com/questions/41988/how-does-sslstrip-work">sslstrip attacks</a>. Make sure
-      that the padlock icon is displayed in the address bar. Enable HTTPS-only mode in your browser.
-    </li>
-
-    <li class="lilist">
-      Install <a href="https://en.wikipedia.org/wiki/NoScript">NoScript</a> to block content such as JavaScript as much
-      as you can. JavaScript inherently presents a massive attack surface, as it is arbitrary code executed directly
-      from
-      a website. NoScript also provides protection against attacks such as <a
-        href="https://en.wikipedia.org/wiki/Cross-site_scripting">cross-site scripting</a>, <a
-        href="https://en.wikipedia.org/wiki/Cross-site_request_forgery">cross-site request forgery</a> and more.
-    </li>
-
-    <li class="lilist">
-      Never visit unknown websites.
-    </li>
-
-    <li class="lilist">
-      Disable WiFi and Bluetooth when not in use.
-    </li>
-
-    <li class="lilist">
-      Use airplane mode and/or take out your SIM card as much as possible to prevent cell tower triangulation.
-    </li>
-
-    <li class="lilist">
-      Cover or remove any webcams or microphones.
-    </li>
-
-    <li class="lilist">
-      Do not give apps excessive permissions.
-    </li>
   </ul>
 
+  <h3>Setup</h3>
+  <p>
+    To set up everything you need to expose the BIOS chip of the X220 by unscrewing keyboard and mousepad like so:
+  </p>
+
+
+  <p>
+    After attach the clip to the SPI programmer, plug it in your computer that you will use to flash coreboot and attach
+    the clip to the exposed BIOS chip like in the picture:
+  </p>
+  <p>Now create a working directory on your computer to store everything relalated to this project</p>
+  <h3>Backup current BIOS</h3>
+  <p>
+    To backup the existing BIOS installation cd into the created directory and use these commands:</p>
+  <pre><code></code></pre>
   <a class="back" href="/index.html">Go back</a>
 
 </body>
