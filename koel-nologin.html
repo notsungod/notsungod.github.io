@@ -31,21 +31,24 @@
     And finally modify the javascript code in the file like so.
     <br>
   <pre><code>...const d={email:"demo@koel.dev",password:"demo"};t("");const
-      r=t(m()?d.email:""),o=t(m()?d.password:""),a=t(!1),p=async()=>{try{await b.login(r.va...
+      r=t(m()?d.email:""),...
     </code></pre>
   <br>
   ==>
-  <pre><code>...const d={email:"demo@koel.dev",password:"demo"};t("");b.login("\<email\>","\<password\>");const
-          r=t(m()?d.email:""),o=t(m()?d.password:""),a=t(!1),p=async()=>{try{await b.login(r.va...
+  <pre><code>...const d={email:"demo@koel.dev",password:"demo"};t("");b.login("YOUR_EMAIL","YOUR_PASSWORD");const
+      r=t(m()?d.email:""),...
     </code></pre>
-  While it is not the most optimal, but a failproof approach, replace <email> , <password> with the corresponding login
-      you are trying to achieve.
-      <br>
-      Now if you visit your koel page you just have to refresh the page one time and you are logged in without typing
-      any credentials in.
-      </p>
+  </p>
+  <p>
+    While it is not the most optimal, but a failproof approach, replace YOUR_EMAIL, YOUR_PASSWORD with the corresponding
+    login
+    you are trying to achieve.
+    <br>
+    Now if you visit your koel page you just have to refresh the page one time and you are logged in without typing
+    any credentials in.
+  </p>
 
-      <br><br>
+  <br><br>
 
 </body>
 
