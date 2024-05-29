@@ -28,13 +28,14 @@
     <br>
     Now look for a file similar to this <code>/var/www/koel/public/build/assets/LoginForm.*.js</code> where * are random
     digits.
-    And finally modify the javascript code in the file like so:
-    From this:
+    And finally modify the javascript code in the file like so.
+    <br>
   <pre><code>...const d={email:"demo@koel.dev",password:"demo"};t("");const
       r=t(m()?d.email:""),o=t(m()?d.password:""),a=t(!1),p=async()=>{try{await b.login(r.va...
     </code></pre>
-  to this:
-  <pre><code>...const d={email:"demo@koel.dev",password:"demo"};t("");b.login("<email>","<password>");const
+  <br>
+  ==>
+  <pre><code>...const d={email:"demo@koel.dev",password:"demo"};t("");b.login("\<email\>","\<password\>");const
           r=t(m()?d.email:""),o=t(m()?d.password:""),a=t(!1),p=async()=>{try{await b.login(r.va...
     </code></pre>
   While it is not the most optimal, but a failproof approach, replace <email> , <password> with the corresponding login
