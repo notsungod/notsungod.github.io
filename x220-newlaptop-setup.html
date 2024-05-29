@@ -75,8 +75,7 @@
     <br>
     (Install flashrom package for your distribution)
   </p>
-  <pre><code>
-      cd ~/mycorebootdir
+  <pre><code>cd ~/mycorebootdir
       flashrom -p ch341a_spi -c MX25L6405 -r flash01.bin</code></pre>
   <p>
     NOTE: If the command fails, its possible you attached the clip the wrong way around. Also make sure you replace the
@@ -112,7 +111,7 @@
       sudo cp flashregion_3_gbe.bin coreboot/3rdparty/blobs/mainboard/lenovo/x220/gbe.bin
     </code></pre>
   <p>To prepare the coreboot toolchain we will:</p>
-  <pre><code> git submodule update --init --recursive
+  <pre><code>git submodule update --init --recursive
       # By default, git submodule won't download the blobs (Which is weird)
       # So we have to do it manually
       cd ~/Code/x220/coreboot/3rdparty
@@ -879,8 +878,7 @@
       coreboot/build/coreboot.rom
     </code></p>
   <p>With this command you can flash the new BIOS on your X220</p>
-  <pre><code>
-      flashrom -p ch341a_spi -c MX25L6405 -w coreboot/build/coreboot.rom</code></pre>
+  <pre><code>flashrom -p ch341a_spi -c MX25L6405 -w coreboot/build/coreboot.rom</code></pre>
   <p>DONE! gg</p>
   <a class="back" href="/index.html">Go back</a>
 

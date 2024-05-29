@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang=en>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" type="text/css" href="/styles.css">
+  <script src="/theme.js"></script>
+  <script type="module" src="/button.js"></script>
+  <title>Blog | notsungod's Blog</title>
+</head>
+
+<body>
+  <button class="theme-toggle">🌓</button>
+  <h1>How to remove login page using koel</h1>
+  <p>
+    Before we start i should mention that following this post you most likely grant anyone (who is anticipated) a
+    "www-data" shell if you run koel on a self hosted linux server.
+  </p>
+  <p>
+    If that didn't scare you, you are as crazy as me and can continue. :)
+  </p>
+
+  <p>
+    First make sure you run koel like it should normally by following the official installation guide.
+    <br>
+    Now look for a file similar to this <code>/var/www/koel/public/build/assets/LoginForm.*.js</code> where * are random
+    digits.
+    And finally modify the javascript code in the file like so:
+    From this:
+  <pre><code>...const d={email:"demo@koel.dev",password:"demo"};t("");const
+      r=t(m()?d.email:""),o=t(m()?d.password:""),a=t(!1),p=async()=>{try{await b.login(r.va...
+    </code></pre>
+  to this:
+  <pre><code>...const d={email:"demo@koel.dev",password:"demo"};t("");b.login("<email>","<password>");const
+          r=t(m()?d.email:""),o=t(m()?d.password:""),a=t(!1),p=async()=>{try{await b.login(r.va...
+    </code></pre>
+  While it is not the most optimal, but a failproof approach, replace <email> , <password> with the corresponding login
+      you are trying to achieve.
+      <br>
+      Now if you visit your koel page you just have to refresh the page one time and you are logged in without typing
+      any credentials in.
+      </p>
+
+      <br><br>
+
+</body>
+
+</html>
