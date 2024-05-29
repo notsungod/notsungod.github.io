@@ -14,7 +14,7 @@
 
 <body>
   <button class="theme-toggle">🌓</button>
-  <h1>How to remove login page using koel</h1>
+  <h1>How to remove login/bypass page in koel</h1>
   <p>
     Before we start i should mention that following this post you most likely grant anyone (who is anticipated) a
     "www-data" shell if you run koel on a self hosted linux server.
@@ -26,7 +26,8 @@
   <p>
     First make sure you run koel like it should normally by following the official installation guide.
     <br>
-    Now look for a file similar to this <code>/var/www/koel/public/build/assets/LoginForm.*.js</code> where * are random
+    Now look for a file similar to this <code>/var/www/koel/public/build/assets/LoginForm.*.js</code> where
+    <code>*</code> are random
     digits.
     And finally modify the javascript code in the file like so.
     <br>
@@ -40,15 +41,25 @@
     </code></pre>
   </p>
   <p>
-    While it is not the most optimal, but a failproof approach, replace YOUR_EMAIL, YOUR_PASSWORD with the corresponding
+    Finally replace YOUR_EMAIL, YOUR_PASSWORD with the corresponding
     login
     you are trying to achieve.
     <br>
-    Now if you visit your koel page you just have to refresh the page one time and you are logged in without typing
-    any credentials in.
+    Now if you visit your koel page you just have to refresh the page once again and you are logged in without
+    submitting
+    any credentials.
   </p>
 
   <br><br>
+  <p>
+    If you wish to support me and my work, you can donate using the following address:
+  </p>
+
+  <ul>
+    <li>Monero: <pre>
+        <code>86mPPTR82iQAwM7wARGGhRE8sqtqKe7wSbyxs1DRoF25AMfEKeJbWf15AXFigEv5K28xyEh4AJhVz2vUvYv1ZtTL5kMHoFa</code>
+      </pre>
+    </li>
 
 </body>
 
